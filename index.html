@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Graduation</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: url('rain.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: "Segoe UI", sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+    }
+
+    #snow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    #story-box {
+      max-width: 700px;
+      padding: 40px;
+      border: 2px solid #00ffe1;
+      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 25px #00ffe1;
+      font-size: 1.5rem;
+      color: #ffffff;
+      z-index: 2;
+      position: relative;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      overflow: hidden;
+      height: auto;
+      transform-origin: top;
+      animation: none;
+    }
+
+    .fade-in {
+      opacity: 0.8 !important;
+    }
+
+    @keyframes resizeSmooth {
+      0% {
+        transform: scaleY(0.95);
+        opacity: 0;
+      }
+      100% {
+        transform: scaleY(1);
+        opacity: 1;
+      }
+    }
+
+    ::selection {
+      background: #00ffe1;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="snow"></canvas>
+
+  <div id="story-box">👆 Nơi tình yêu bắt đầu.</div>
+
+  <audio id="bgm" src="nooneelse.mp3" autoplay loop></audio>
+
+  <script>
+    const parts = [
+      "Ngày xưa đó, mãi mãi bay xa ...",
+      "Thật khó để viết ra những lời này...",
+      "Thật vui khi thấy các em trưởng thành hàng ngày. Có những bạn, anh biết từ hồi bé xíu, tới tận bây giờ cũng 6-7 năm rồi. Được trông thấy các em vững bước tới ngưỡng cửa thay đổi của cuộc đời, thật sự là những trải nghiệm khó quên.",
+      "Nhưng thời gian không nán lại với chúng ta quá lâu. Ba năm trôi qua nhanh lắm các em ạ. Ngày thi sắp tới, cũng có nghĩa là ngày chia xa đã gần kề ...",
+      "Mọi thứ, sắp chỉ còn là hoài niệm, là ký ức...",
+      "Thật vui khi được đồng hành cùng các em trong năm vừa qua. Một năm quá nhiều khó khăn, vất vả. Một năm của sự thay đổi xáo trộn. Một năm cách mạng toàn bộ chương trình tới mức khủng khiếp mà mọi người đều chênh vênh.",
+      "Chưa có khóa nào vất vả vậy. Chúng ta có COVID - 19, học online thông cấp 2, lên cấp 3 sách mới, chương trình mới. Tới lúc thi lại cách thi mới, với vô vàn xáo trộn.",
+      "Nhưng chúng ta đã có một chuẩn bị khá ổn, để khi ngày thi cận kề, chúng ta sẵn sàng đương đầu với thử thách khó khăn nhất.",
+      "Có thể các em không phải là những học sinh giỏi nhất, chăm chỉ nhất ... Nhưng các em đã trở thành phiên bản tốt nhất, hoàn hảo nhất của chính mình trong một năm học đầy khó khăn như năm nay.",
+      "Thật vui khi anh được đồng hành cùng các em suốt một năm qua. Mặc dù anh khá khó tính, yêu cầu đoạn cuối lại dồn dập, nhiều việc, nhưng các em phần lớn đều rất cố gắng, và các em đã tiến bộ hơn rất nhiều .",
+      "Anh nhìn thấy sự thay đổi vượt trội của một số bạn, đã từng được đánh giá yếu hơn, giờ đã có những bước chân vững chắc trong con đường chinh phục thử thách lớn đầu đời, đủ để anh thấy yên tâm trong chặng đường sắp tới.",
+      "Và cũng thật vui, khi các em không chỉ coi anh là thầy, là người truyền tải kiến thức, mà còn là một người bạn, một người anh để tâm sự, lắng nghe một cách chân thành nhất.",
+      "Cùng điểm xem năm nay ta có gì các em nhé 🥰",
+      "24 đề trọng tâm - tượng trưng cho 24 điểm. Năm nay, 8 điểm mỗi môn cũng là một sự nỗ lực khổng lồ của các em,",
+      "120 đề tổng cộng - tượng trưng cho 120 ngày các em đã ôn luyện vất vả,",
+      "16 đề nâng cao (2 đề một tuần) - là 8 tuần các em tăng tốc về đích.",
+      "Anh không biết nói gì hơn ngoài sự tự hào và trân trọng những nỗ lực các em đã bỏ ra cho kỳ thi quan trọng đánh dấu mốc trưởng thành của cuộc đời này ❤️",
+      "Sắp tới ngày thi rồi. Sau ngày biết điểm là các em sẽ đứng trước nhiều ngã rẽ của cuộc đời.",
+      "Hãy lựa chọn sao cho không phải hối tiếc. Hãy học cách bước tới và nắm lấy tương lai bằng sức trẻ, cho dù việc đó không hề dễ dàng. Sẽ có rất nhiều khó khăn đang chờ đợi các em, khi đó, hãy nhớ rằng đứng sau các em vẫn có anh sẵn sàng cho các em lời khuyên trong những tình huống khó khăn nhất.",
+      "Buổi học cuối, ta có một bài tập nhẹ nhàng, nhưng làm rất dài, anh sẽ chờ đợi các em làm bài và báo cáo tiến độ hàng năm nhé 🥰",
+      "Bài tập về nhà",
+      "Thời gian nộp bài: Không có thời hạn",
+      "❤️❤️❤️ Hãy sống thật hạnh phúc nhé ❤️❤️❤️",
+      "Chúc tất cả các em thành công với lựa chọn của mình ❤️"
+    ];
+
+    const storyBox = document.getElementById('story-box');
+    const audio = document.getElementById('bgm');
+    let index = -1;
+    let typingSpeed = 40;
+    let typingTimer;
+
+    function typeText(text) {
+      clearInterval(typingTimer);
+      storyBox.classList.remove('fade-in');
+      storyBox.textContent = '';
+      let i = 0;
+      storyBox.style.opacity = 0;
+
+      setTimeout(() => {
+        storyBox.classList.add('fade-in');
+        typingTimer = setInterval(() => {
+          if (i < text.length) {
+            storyBox.textContent += text.charAt(i);
+            i++;
+          } else {
+            clearInterval(typingTimer);
+          }
+        }, typingSpeed);
+      }, 200);
+    }
+
+    document.body.addEventListener('click', () => {
+      index++;
+      if (index < parts.length) {
+        typeText(parts[index]);
+      } else {
+        typeText("Gudluck everyone ❤️❤️❤️");
+        index = -1;
+      }
+      if (audio.paused) audio.play();
+    });
+
+    audio.volume = 0.5;
+    audio.addEventListener('ended', () => {
+      audio.currentTime = 0;
+      audio.play();
+    });
+
+    // Smooth resize animation on story-box
+    const resizeObserver = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        const el = entry.target;
+        el.style.animation = 'none';
+        void el.offsetWidth; // force reflow
+        el.style.animation = 'resizeSmooth 0.4s ease';
+      }
+    });
+    resizeObserver.observe(storyBox);
+
+    // Snowfall effect
+    const canvas = document.getElementById('snow');
+    const ctx = canvas.getContext('2d');
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    let flakes = [];
+    const flakesCount = 150;
+
+    function createFlakes() {
+      for (let i = 0; i < flakesCount; i++) {
+        flakes.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          r: Math.random() * 4 + 1,
+          d: Math.random() + 1
+        });
+      }
+    }
+
+    function drawFlakes() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "white";
+      ctx.beginPath();
+      for (let i = 0; i < flakes.length; i++) {
+        let f = flakes[i];
+        ctx.moveTo(f.x, f.y);
+        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2, true);
+      }
+      ctx.fill();
+      moveFlakes();
+    }
+
+    let angle = 0;
+
+    function moveFlakes() {
+      angle += 0.01;
+      for (let i = 0; i < flakes.length; i++) {
+        let f = flakes[i];
+        f.y += Math.pow(f.d, 2) + 1;
+        f.x += Math.sin(angle) * 2;
+
+        if (f.y > height) {
+          flakes[i] = {
+            x: Math.random() * width,
+            y: 0,
+            r: f.r,
+            d: f.d
+          };
+        }
+      }
+    }
+
+    function updateSnow() {
+      drawFlakes();
+      requestAnimationFrame(updateSnow);
+    }
+
+    window.addEventListener("resize", () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    });
+
+    createFlakes();
+    updateSnow();
+  </script>
+</body>
+</html>
+
